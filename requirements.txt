@@ -1,0 +1,9 @@
+certifi==2020.12.5
+chardet==4.0.0
+cryptocompare==0.7.5
+greenlet==1.0.0
+idna==2.10
+PyMySQL==1.0.2
+requests==2.25.1
+SQLAlchemy==1.4.7
+urllib3==1.26.4

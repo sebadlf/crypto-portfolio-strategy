@@ -14,7 +14,7 @@ for currency in model_service.get_currencies_list():
     print(currency)
 
     try:
-        historical_data = cryptocompare.get_historical_price_hour(currency, "USDT", limit=2000, exchange="binance")
+        historical_data = cryptocompare.get_historical_price_hour(currency, "USDT", limit=2000)
         model_service.save_historical_data(currency, historical_data)
     except:
         pass

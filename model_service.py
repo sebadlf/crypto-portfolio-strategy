@@ -59,4 +59,13 @@ def save_historical_data(symbol, historical_data):
             market_data.conversion_type = hour_data['conversionType']
             market_data.conversion_symbol = hour_data['conversionSymbol']
 
+def export_historical_data(table = 'market_data'):
+    import pandas as pd
+    import model
+
+    r = pd.read_sql(table, con=model.engine)
+
+    return r
+
+
 

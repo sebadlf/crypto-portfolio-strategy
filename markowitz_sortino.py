@@ -51,23 +51,23 @@ def markowitz(df, coins_dict, vol_neg_accepted = 0):
 
 
 
+retornos = None
 
-if __name__ == '__main__':
-    from sqlalchemy import create_engine
-    activos = {'1INCH': 0.5, 'AAVE': 0.3, 'ACM': 0.2}
 
+def build_retornos():
+    global retornos
 
     df = model_service.export_historical_data()
 
     df.drop(['id', 'open', 'high', 'low', 'volume', 'close_time', 'quote_asset_volume', 'trades',
-             'taker_buy_base', 'taker_buy_quote', 'ignore'], axis= 1, inplace= True)
+             'taker_buy_base', 'taker_buy_quote', 'ignore'], axis=1, inplace=True)
 
     df = df.pivot(index='open_time', columns='symbol', values='close')
 
     # borro up and down
     columnas = df.columns
     for i in columnas:
-        if i.endswith(('DOWN','UP')):
+        if i.endswith(('DOWN', 'UP')):
             df = df.drop([i], axis=1)
 
     columnas = df.columns
@@ -75,8 +75,7 @@ if __name__ == '__main__':
     for i in range(len(df.iloc[0])):
         if not df.iloc[0, i] > 0:
             columna_borrar = columnas[i]
-            df_copy.drop([columna_borrar], axis=1, inplace= True)
-            # print(columna_borrar)
+            df_copy.drop([columna_borrar], axis=1, inplace=True)
 
     # df_copy.to_excel('pturbs.xlsx')
 
@@ -84,11 +83,80 @@ if __name__ == '__main__':
     retornos = retornos.dropna()
     # print(retornos)
 
-    retornos = retornos.filter(list(activos.keys())).dropna()
+def sortino_2(retornos, df_adjust, coins_dict, vol_neg_accepted = 0):
+    r = {}
+    r['coins'] = list(coins_dict.keys())
+    r['pond'] = [coins_dict[x] for x in r['coins']]
+    r['roi'] = np.sum((retornos.mean() * r['pond'] * 365))
 
-    df_ajustado = filter_return_2(df = retornos, coins_dict=activos)
-    print(df_ajustado)
+    r['volatility_2'] = np.sqrt(np.dot(r['pond'], np.dot(df_adjust.cov() * 365, r['pond'])))
+    r['sortino_2'] = r['roi'] / r['volatility_2']
 
-    print(markowitz(df = df_ajustado, coins_dict= activos))
+    return {'roi': r['roi'], 'volatility': r['volatility_2'] , 'ratio': r['sortino_2']}
+
+
+def calc_ratio(distribution):
+    global retornos
+
+    retornos = retornos.filter(list(distribution.keys())).dropna()
+    df_adjust = filter_return_2(df=retornos, coins_dict=distribution)
+    res = sortino_2(retornos=retornos, df_adjust = df_adjust, coins_dict=distribution)
+
+    return res
+
+def get_coins():
+
+    coins = retornos.columns()
+
+    return coins
+
+
+
+
+
+
+
+
+
+
+if __name__ == '__main__':
+    from sqlalchemy import create_engine
+    # activos = {'1INCH': 0.5, 'AAVE': 0.3, 'ACM': 0.2}
+    #
+    #
+    # df = model_service.export_historical_data()
+    #
+    # df.drop(['id', 'open', 'high', 'low', 'volume', 'close_time', 'quote_asset_volume', 'trades',
+    #          'taker_buy_base', 'taker_buy_quote', 'ignore'], axis= 1, inplace= True)
+    #
+    # df = df.pivot(index='open_time', columns='symbol', values='close')
+    #
+    # # borro up and down
+    # columnas = df.columns
+    # for i in columnas:
+    #     if i.endswith(('DOWN','UP')):
+    #         df = df.drop([i], axis=1)
+    #
+    # columnas = df.columns
+    # df_copy = df.copy()
+    # for i in range(len(df.iloc[0])):
+    #     if not df.iloc[0, i] > 0:
+    #         columna_borrar = columnas[i]
+    #         df_copy.drop([columna_borrar], axis=1, inplace= True)
+    #         # print(columna_borrar)
+    #
+    # # df_copy.to_excel('pturbs.xlsx')
+    #
+    # retornos = df_copy.pct_change()
+    # retornos = retornos.dropna()
+    # # print(retornos)
+    #
+    # retornos = retornos.filter(list(activos.keys())).dropna()
+    #
+    # df_ajustado = filter_return_2(df = retornos, coins_dict=activos)
+    # print(df_ajustado)
+    #
+    # print(markowitz(df = df_ajustado, coins_dict= activos))
+    pass
 
 

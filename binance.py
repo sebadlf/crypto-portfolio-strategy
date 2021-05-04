@@ -163,7 +163,7 @@ class Binance():
 
             symbols_list = []
             for symbol in symbols:
-                search = r'\D*DOWN|UP|BULL|BEAR|^DAI|^BUSD|^TUSD|^USDC|^PAX|^USDT'
+                search = r'\D*DOWN|UP|BULL|BEAR|^DAI|^BUSD|^TUSD|^USDC|^PAX|^USDT|^USDSB|^AUD|^EUR|^GBP|^SUSD'
                 if re.search(search, symbol) is None:
                     base_currency = symbol.split(quote_currency)[0]
                     lst = [symbol, base_currency, quote_currency]

@@ -4,8 +4,8 @@ from operator import itemgetter
 from markowitz_sortino import calc_ratio, get_coins
 from datetime import datetime
 
-CRYPTO_COUNT = 5
-MAX_PERCENTAGE = 0.25
+CRYPTO_COUNT = 8
+MAX_PERCENTAGE = 0.20
 
 def char_range(c1, c2):
     """Generates the characters from `c1` to `c2`, inclusive."""
@@ -19,15 +19,6 @@ for x in letters:
     for y in letters:
         coins.append(x+y)
 
-coins = get_coins()
-
-coin_dict = {}
-
-for coin in get_coins():
-    coin_dict[coin] = {
-        'min': 0.005,
-        'max': MAX_PERCENTAGE
-    }
 
 def get_value(coin):
     value = 0
@@ -103,10 +94,10 @@ def get_top_results(coin_dict, old_top):
     max_len = len(coins) ** 2
 
     # maximum max_lenght
-    max_len = 10000 if max_len > 10000 else max_len
+    max_len = 1000 if max_len > 1000 else max_len
 
     #minimim max_lenght
-    max_len = 1000 if max_len < 1000 else max_len
+    max_len = 100 if max_len < 100 else max_len
 
     for i in range(max_len):
         distribution = get_random_distribution(coin_dict, coins)
@@ -118,6 +109,8 @@ def get_top_results(coin_dict, old_top):
 
         data.append(result)
 
+        # print(result)
+
     data += old_top
 
     sorted_data = sorted(data, key=itemgetter('ratio'), reverse=True)
@@ -125,7 +118,7 @@ def get_top_results(coin_dict, old_top):
     # top_len = int(len(coins) ** 3)
     # top_len = 10000 if top_len < 10000 else top_len
 
-    top_len = int(max_len / 10)
+    top_len = int(max_len / 5)
 
     return sorted_data[0:top_len]
 
@@ -211,13 +204,23 @@ def compare_distribution(distA, distB):
 
 
 def run_montecarlo():
+    # coins = get_coins()
+
+    coin_dict = {}
+
+    for coin in get_coins():
+        coin_dict[coin] = {
+            'min': 0.005,
+            'max': MAX_PERCENTAGE
+        }
+
     start = datetime.now()
 
     top = []
     new_dict = coin_dict
     distribution_difference = 1
 
-    while distribution_difference > 0.01:
+    while distribution_difference > 0.1:
 
         top = get_top_results(new_dict, top)
 

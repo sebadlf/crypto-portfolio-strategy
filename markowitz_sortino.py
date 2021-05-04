@@ -62,6 +62,8 @@ def build_retornos():
     df.drop(['id', 'open', 'high', 'low', 'volume', 'close_time', 'quote_asset_volume', 'trades',
              'taker_buy_base', 'taker_buy_quote', 'ignore'], axis=1, inplace=True)
 
+    # df.drop_duplicates('open_time', inplace=True)
+
     df = df.pivot(index='open_time', columns='symbol', values='close')
 
     # borro up and down
@@ -76,6 +78,8 @@ def build_retornos():
         if not df.iloc[0, i] > 0:
             columna_borrar = columnas[i]
             df_copy.drop([columna_borrar], axis=1, inplace=True)
+
+    print(retornos)
 
     # df_copy.to_excel('pturbs.xlsx')
 
@@ -98,17 +102,23 @@ def sortino_2(retornos, df_adjust, coins_dict, vol_neg_accepted = 0):
 def calc_ratio(distribution):
     global retornos
 
-    retornos = retornos.filter(list(distribution.keys())).dropna()
-    df_adjust = filter_return_2(df=retornos, coins_dict=distribution)
-    res = sortino_2(retornos=retornos, df_adjust = df_adjust, coins_dict=distribution)
+    retornos_select = retornos.filter(list(distribution.keys())).dropna()
+    df_adjust = filter_return_2(df=retornos_select, coins_dict=distribution)
+    res = sortino_2(retornos=retornos_select, df_adjust = df_adjust, coins_dict=distribution)
 
     return res
 
 def get_coins():
 
-    coins = retornos.columns()
+    coins = retornos.columns
 
-    return coins
+    selected_coins = []
+    del_coins = ['DAI', 'BUSD', 'TUSD', 'USDC', 'PAX', 'USDT', 'USDSB', 'AUD', 'EUR', 'GBP', 'SUSD']
+    for symbol in coins:
+        if symbol not in del_coins:
+            selected_coins.append(symbol)
+
+    return selected_coins
 
 
 

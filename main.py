@@ -1,6 +1,11 @@
 import binance
+import markowitz_sortino
+import marcopolo
 
-binance.Binance().saveHistorical('USDT')
+
+# binance.Binance().saveHistorical('USDT')
+markowitz_sortino.build_retornos()
+marcopolo.run_montecarlo()
 
 
 

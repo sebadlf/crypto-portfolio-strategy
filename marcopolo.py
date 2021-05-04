@@ -209,36 +209,38 @@ def compare_distribution(distA, distB):
 
     return diff
 
-start = datetime.now()
 
-top = []
-new_dict = coin_dict
-distribution_difference = 1
+def run_montecarlo():
+    start = datetime.now()
 
-while distribution_difference > 0.01:
+    top = []
+    new_dict = coin_dict
+    distribution_difference = 1
 
-    top = get_top_results(new_dict, top)
+    while distribution_difference > 0.01:
 
-    for result in top[0:10]:
-        print(result)
+        top = get_top_results(new_dict, top)
 
-    new_dict = rebuild_dictionary(top, min_number=CRYPTO_COUNT)
+        for result in top[0:10]:
+            print(result)
 
-    top = filter_top_outside_dict(top, new_dict)
+        new_dict = rebuild_dictionary(top, min_number=CRYPTO_COUNT)
 
-    print(len(new_dict))
-    #print(new_dict)
+        top = filter_top_outside_dict(top, new_dict)
 
-    distribution_difference = compare_distribution(top[0]['distribution'], top[9]['distribution'])
+        print(len(new_dict))
+        #print(new_dict)
 
-    print(distribution_difference)
+        distribution_difference = compare_distribution(top[0]['distribution'], top[9]['distribution'])
 
-    print("-----------")
+        print(distribution_difference)
 
-    if len(new_dict.keys()) > CRYPTO_COUNT * 1.5:
-        top = []
+        print("-----------")
 
-print(datetime.now() - start)
+        if len(new_dict.keys()) > CRYPTO_COUNT * 1.5:
+            top = []
+
+    print(datetime.now() - start)
 
 
 

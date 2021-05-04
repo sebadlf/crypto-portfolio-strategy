@@ -1,6 +1,7 @@
 from sqlalchemy import distinct
 from sqlalchemy.orm import Session
 from datetime import datetime
+import traceback
 
 import model, model_binance
 
@@ -103,3 +104,39 @@ def save_historical_data_binance(symbol, historical_data):
             market_data.taker_buy_base = hour_data[9]
             market_data.taker_buy_quote = hour_data[10]
             market_data.ignore = hour_data[11]
+
+def last_date(symbol, conn,tabla = 'market_data_binance'):
+    from sqlalchemy import create_engine
+    import keys
+
+    query = f'SELECT `id`,`open_time` FROM {tabla} WHERE `symbol` = "{symbol}" ORDER BY `open_time` DESC limit 0,1'
+    res = conn.execute(query).fetchone()
+    fecha = res[1].strftime('%Y-%m-%d %H:%M:%S')
+    res = (res[0], fecha)
+
+    return res
+
+def del_row(last_date, conn, tabla = 'market_data_binance'):
+
+    id = last_date[0]
+    query = f'DELETE FROM {tabla} WHERE `id`={id}'
+    conn.execute(query)
+
+
+
+if __name__ == '__main__':
+    # from sqlalchemy import create_engine
+    # import keys
+    # db_connection = create_engine(keys.DB_CONNECTION)
+    #
+    # print(last_date('BTC', db_connection))
+
+    lista1 = [0,1,2,3]
+    lista2 = [4,5,6]
+
+    lista = lista1 + lista2
+    print(lista)
+
+    pass
+
+

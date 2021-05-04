@@ -73,7 +73,8 @@ def sync_coins_binance(binance_symbols):
 
             db_coin.base_currency = pair[1]
             db_coin.quote_currency = pair[2]
-def export_historical_data(table = 'market_data'):
+
+def export_historical_data(table = 'market_data_binance'):
     import pandas as pd
     import model
 

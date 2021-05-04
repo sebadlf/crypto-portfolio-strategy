@@ -1,11 +1,11 @@
 import random
 import math
 from operator import itemgetter
-from markowitz_sortino import calc_sortino, get_coins
+from markowitz_sortino import calc_ratio, get_coins
 from datetime import datetime
 
-CRYPTO_COUNT = 10
-MAX_PERCENTAGE = 0.15
+CRYPTO_COUNT = 5
+MAX_PERCENTAGE = 0.25
 
 def char_range(c1, c2):
     """Generates the characters from `c1` to `c2`, inclusive."""
@@ -23,100 +23,11 @@ coins = get_coins()
 
 coin_dict = {}
 
-filtered_cryptos = [
-'BKRW',
-'DAI',
-'FXS',
-'LEND',
-'VEN',
-'HC',
-'MCO',
-'ONG',
-'CLOAK',
-'GNT',
-'HCC',
-'INS',
-'SPARTA',
-'CTR',
-'EDO',
-'EPS',
-'TRIG',
-'USDS',
-'ARN',
-'BETH',
-'COS',
-'DEXE',
-'ERD',
-'GXS',
-'USDSB',
-'ELC',
-'ICN',
-'MOD',
-'PROS',
-'STORM',
-'BIFI',
-'AUTO',
-'BTG',
-'BCHDOWN',
-'BCHUP',
-'UFT',
-'BAKE',
-'SLP',
-'BTCB',
-'TLM',
-'BOT',
-'PUNDIX',
-'TKO',
-'CFX',
-'SUPER',
-'RAMP',
-'PERP',
-'LINA',
-'ALICE',
-'BCHA',
-'AUCTION',
-'EASY',
-'TVK',
-'KP3R',
-'DEGO',
-'PROM',
-'POND',
-'OM',
-'ACM',
-'FIS',
-'BADGER',
-'ENG',
-'POE',
-'CAKE',
-'DODO',
-'SUB',
-'NPXS',
-'SFP',
-'ATM',
-'BCPT',
-'LIT',
-'FUEL',
-'VIBE',
-'BURGER',
-'FIRO',
-
-
-'PAX',
-'PAXG',
-'DOGE',
-'GBP',
-'AUD',
-
-'DREP'
-]
-
-for coin in coins:
-    if (not coin.endswith('BULL')) and (not coin.endswith('BEAR')) and (not coin.endswith('UP')) and (not coin.endswith('DOWN')) and ('USD' not in coin) and coin not in ['EUR','HC','ERD','MCO','GXS','BKRW','INS','COS','EDO', 'DAI', 'ERD', 'ICN'] \
-            and coin not in filtered_cryptos:
-        coin_dict[coin] = {
-            'min': 0.005,
-            'max': MAX_PERCENTAGE
-        }
+for coin in get_coins():
+    coin_dict[coin] = {
+        'min': 0.005,
+        'max': MAX_PERCENTAGE
+    }
 
 def get_value(coin):
     value = 0
@@ -202,14 +113,14 @@ def get_top_results(coin_dict, old_top):
 
         result = {
             'distribution': distribution,
-            'result': calc_sortino(distribution)
+            **calc_ratio(distribution)
         }
 
         data.append(result)
 
     data += old_top
 
-    sorted_data = sorted(data, key=itemgetter('result'), reverse=True)
+    sorted_data = sorted(data, key=itemgetter('ratio'), reverse=True)
 
     # top_len = int(len(coins) ** 3)
     # top_len = 10000 if top_len < 10000 else top_len

@@ -109,10 +109,15 @@ def last_date(symbol, conn,tabla = 'market_data_binance'):
     from sqlalchemy import create_engine
     import keys
 
-    query = f'SELECT `id`,`open_time` FROM {tabla} WHERE `symbol` = "{symbol}" ORDER BY `open_time` DESC limit 0,1'
-    res = conn.execute(query).fetchone()
-    fecha = res[1].strftime('%Y-%m-%d %H:%M:%S')
-    res = (res[0], fecha)
+    res = False
+
+    try:
+        query = f'SELECT `id`,`open_time` FROM {tabla} WHERE `symbol` = "{symbol}" ORDER BY `open_time` DESC limit 0,1'
+        res = conn.execute(query).fetchone()
+        fecha = res[1].strftime('%Y-%m-%d %H:%M:%S')
+        res = (res[0], fecha)
+    except:
+        print(f'no hay ultima fecha de {symbol}, bajando historico')
 
     return res
 

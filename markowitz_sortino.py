@@ -93,10 +93,11 @@ def sortino_2(retornos, df_adjust, coins_dict, vol_neg_accepted = 0):
     r['pond'] = [coins_dict[x] for x in r['coins']]
     r['roi'] = np.sum((retornos.mean() * r['pond'] * 365))
 
-    r['volatility_2'] = np.sqrt(np.dot(r['pond'], np.dot(df_adjust.cov() * 365, r['pond'])))
-    r['sortino_2'] = r['roi'] / r['volatility_2']
+    sharpe = {}
+    sharpe['volatility'] = np.sqrt(np.dot(r['pond'], np.dot(df_adjust.cov() * 365, r['pond'])))
+    sharpe['sharpe'] = r['roi'] / sharpe['volatility']
 
-    return {'roi': r['roi'], 'volatility': r['volatility_2'] , 'ratio': r['sortino_2']}
+    return {'roi': r['roi'], 'volatility': sharpe['volatility'], 'ratio': sharpe['sharpe']}
 
 
 def calc_ratio(distribution):

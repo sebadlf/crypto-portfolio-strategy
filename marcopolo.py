@@ -94,10 +94,10 @@ def get_top_results(coin_dict, old_top):
     max_len = len(coins) ** 2
 
     # maximum max_lenght
-    max_len = 1000 if max_len > 1000 else max_len
+    max_len = 10000 if max_len > 10000 else max_len
 
     #minimim max_lenght
-    max_len = 100 if max_len < 100 else max_len
+    max_len = 1000 if max_len < 1000 else max_len
 
     for i in range(max_len):
         distribution = get_random_distribution(coin_dict, coins)
@@ -118,7 +118,7 @@ def get_top_results(coin_dict, old_top):
     # top_len = int(len(coins) ** 3)
     # top_len = 10000 if top_len < 10000 else top_len
 
-    top_len = int(max_len / 5)
+    top_len = int(max_len / 10)
 
     return sorted_data[0:top_len]
 

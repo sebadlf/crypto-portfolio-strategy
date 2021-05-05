@@ -113,7 +113,8 @@ def get_coins():
     coins = retornos.columns
 
     selected_coins = []
-    del_coins = ['DAI', 'BUSD', 'TUSD', 'USDC', 'PAX', 'USDT', 'USDSB', 'AUD', 'EUR', 'GBP', 'SUSD']
+    del_coins = ['DAI', 'BUSD', 'TUSD', 'USDC', 'PAX', 'USDT', 'USDSB', 'AUD', 'EUR', 'GBP', 'SUSD', 'PAXG', 'JUV',
+                 'ACM', 'DREP', 'PSG', 'DOGE', 'XRP']
     for symbol in coins:
         if symbol not in del_coins:
             selected_coins.append(symbol)

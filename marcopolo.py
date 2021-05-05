@@ -4,8 +4,8 @@ from operator import itemgetter
 from markowitz_sortino import calc_ratio, get_coins
 from datetime import datetime
 
-CRYPTO_COUNT = 8
-MAX_PERCENTAGE = 0.20
+CRYPTO_COUNT = 20
+MAX_PERCENTAGE = 0.10
 
 def char_range(c1, c2):
     """Generates the characters from `c1` to `c2`, inclusive."""
@@ -79,9 +79,7 @@ def get_random_distribution(coins_dict, all_coins):
     rest = round(1 - total, 4)
     values.append(rest)
 
-    values.sort(reverse=True)
-
-    result = dict(zip(selected_coins, values))
+    result = dict(sorted(list(zip(selected_coins, values)), key=lambda t: t[1], reverse=True))
 
     return result
 
@@ -103,8 +101,8 @@ def get_top_results(coin_dict, old_top):
         distribution = get_random_distribution(coin_dict, coins)
 
         result = {
-            'distribution': distribution,
-            **calc_ratio(distribution)
+            **calc_ratio(distribution),
+            'distribution': distribution
         }
 
         data.append(result)
@@ -122,9 +120,12 @@ def get_top_results(coin_dict, old_top):
 
     return sorted_data[0:top_len]
 
-def rebuild_dictionary(top_values, min_number):
+def rebuild_dictionary(top_values, old_dict, min_number):
 
     new_dict = {}
+
+    if len(old_dict.keys()) == min_number:
+         top_values = top_values[0:10]
 
     for result in top_values:
         distribution = result['distribution']
@@ -159,12 +160,12 @@ def rebuild_dictionary(top_values, min_number):
     filtered_dict = {}
 
     for element in filtered_data:
-        if len(filtered_dict.keys()) == min_number:
+        if len(filtered_data) > min_number:
             element['min'] = 0.005
             element['max'] = MAX_PERCENTAGE
         else:
-            element['min'] = element['min'] - 0.005 if element['min'] - 0.005 > 0.005 else 0.005
-            element['max'] = element['max'] + 0.005 if element['max'] + 0.005 < MAX_PERCENTAGE else MAX_PERCENTAGE
+            element['min'] = element['min'] / 1.001 if element['min'] / 1.001 > 0.005 else 0.005
+            element['max'] = element['max'] * 1.001 if element['max'] * 1.001 < MAX_PERCENTAGE else MAX_PERCENTAGE
 
         filtered_dict[element['coin']] = element
 
@@ -220,14 +221,14 @@ def run_montecarlo():
     new_dict = coin_dict
     distribution_difference = 1
 
-    while distribution_difference > 0.1:
+    while distribution_difference > 0.001:
 
         top = get_top_results(new_dict, top)
 
         for result in top[0:10]:
             print(result)
 
-        new_dict = rebuild_dictionary(top, min_number=CRYPTO_COUNT)
+        new_dict = rebuild_dictionary(top, new_dict, min_number=CRYPTO_COUNT)
 
         top = filter_top_outside_dict(top, new_dict)
 

@@ -132,6 +132,18 @@ def get_coins():
 
 
 if __name__ == '__main__':
+
+    ticker = 'poly'
+    r = {'polyshiba': {}}
+
+    print(r.get(ticker))
+
+    if r != {} and r.get(ticker) != None and r.get(ticker) != {}:
+        print('poly')
+
+    hola = [1,2,3,4]
+    print(str(hola))
+
     from sqlalchemy import create_engine
     # activos = {'1INCH': 0.5, 'AAVE': 0.3, 'ACM': 0.2}
     #

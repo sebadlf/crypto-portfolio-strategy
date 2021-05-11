@@ -93,11 +93,10 @@ def sortino_2(retornos, df_adjust, coins_dict, vol_neg_accepted = 0):
     r['pond'] = [coins_dict[x] for x in r['coins']]
     r['roi'] = np.sum((retornos.mean() * r['pond'] * 365))
 
-    sharpe = {}
-    sharpe['volatility'] = np.sqrt(np.dot(r['pond'], np.dot(df_adjust.cov() * 365, r['pond'])))
-    sharpe['sharpe'] = r['roi'] / sharpe['volatility']
+    r['volatility_2'] = np.sqrt(np.dot(r['pond'], np.dot(df_adjust.cov() * 365, r['pond'])))
+    r['sortino_2'] = r['roi'] / r['volatility_2']
 
-    return {'roi': r['roi'], 'volatility': sharpe['volatility'], 'ratio': sharpe['sharpe']}
+    return {'roi': r['roi'], 'volatility': r['volatility_2'] , 'ratio': r['sortino_2']}
 
 
 def calc_ratio(distribution):
@@ -115,7 +114,7 @@ def get_coins():
 
     selected_coins = []
     del_coins = ['DAI', 'BUSD', 'TUSD', 'USDC', 'PAX', 'USDT', 'USDSB', 'AUD', 'EUR', 'GBP', 'SUSD', 'PAXG', 'JUV',
-                 'ACM', 'DREP', 'PSG', 'DOGE', 'XRP']
+                 'ACM', 'DREP', 'PSG', 'DOGE', 'XRP', 'XZC', 'COCOS', 'NPXS']
     for symbol in coins:
         if symbol not in del_coins:
             selected_coins.append(symbol)

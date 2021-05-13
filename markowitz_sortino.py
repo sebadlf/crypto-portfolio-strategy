@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+pd.options.display.max_rows = 10000
+
 import model_service
 import config
 
@@ -54,7 +56,6 @@ def markowitz(df, coins_dict, vol_neg_accepted = 0):
 
 retornos = None
 
-
 def build_retornos():
     global retornos
 
@@ -63,30 +64,38 @@ def build_retornos():
     df.drop(['id', 'open', 'high', 'low', 'volume', 'close_time', 'quote_asset_volume', 'trades',
              'taker_buy_base', 'taker_buy_quote', 'ignore'], axis=1, inplace=True)
 
-    # df.drop_duplicates('open_time', inplace=True)
-
     df = df.pivot(index='open_time', columns='symbol', values='close')
 
-    # borro up and down
+    # borro up and down y las que no sean selected coins
+    coins = df.columns
+    selected_coins = []
+    del_coins = [*config.stable_coins, *config.disallowed_coins]
+
+    for symbol in coins:
+        if symbol not in del_coins:
+            selected_coins.append(symbol)
+
     columnas = df.columns
     for i in columnas:
-        if i.endswith(('DOWN', 'UP')):
+        if i.endswith(('DOWN', 'UP')) or i not in selected_coins:
             df = df.drop([i], axis=1)
 
-    columnas = df.columns
-    df_copy = df.copy()
-    for i in range(len(df.iloc[0])):
-        if not df.iloc[0, i] > 0:
-            columna_borrar = columnas[i]
-            df_copy.drop([columna_borrar], axis=1, inplace=True)
+    # borro tickers que en algun momento no tengan datos (Nan)
+    df_copy = df.dropna(axis=1)
 
-    # print(retornos)
 
-    # df_copy.to_excel('pturbs.xlsx')
+    retornos = np.log((df_copy / df_copy.shift()).dropna())
 
-    retornos = df_copy.pct_change()
-    retornos = retornos.dropna()
-    # print(retornos)
+    columnas = retornos.columns
+    columnas_borrar = []
+    # borro ticker si tiene mov mayor al 50%
+    for fila in range(len(retornos)):
+        for columna in range(len(retornos.iloc[fila])):
+            retorno = retornos.iloc[fila, columna]
+            if retorno > 0.5 or retorno < -0.5:
+                columnas_borrar.append(columnas[columna])
+    retornos.drop(columnas_borrar, axis=1, inplace= True)
+
 
 def sortino_2(retornos, df_adjust, coins_dict, vol_neg_accepted = 0):
     r = {}
@@ -108,6 +117,7 @@ def calc_ratio(distribution):
 
     return res
 
+
 def get_coins():
 
     coins = retornos.columns
@@ -123,54 +133,7 @@ def get_coins():
 
 if __name__ == '__main__':
 
-    ticker = 'poly'
-    r = {'polyshiba': {}}
 
-    print(r.get(ticker))
-
-    if r != {} and r.get(ticker) != None and r.get(ticker) != {}:
-        print('poly')
-
-    hola = [1,2,3,4]
-    print(str(hola))
-
-    from sqlalchemy import create_engine
-    # activos = {'1INCH': 0.5, 'AAVE': 0.3, 'ACM': 0.2}
-    #
-    #
-    # df = model_service.export_historical_data()
-    #
-    # df.drop(['id', 'open', 'high', 'low', 'volume', 'close_time', 'quote_asset_volume', 'trades',
-    #          'taker_buy_base', 'taker_buy_quote', 'ignore'], axis= 1, inplace= True)
-    #
-    # df = df.pivot(index='open_time', columns='symbol', values='close')
-    #
-    # # borro up and down
-    # columnas = df.columns
-    # for i in columnas:
-    #     if i.endswith(('DOWN','UP')):
-    #         df = df.drop([i], axis=1)
-    #
-    # columnas = df.columns
-    # df_copy = df.copy()
-    # for i in range(len(df.iloc[0])):
-    #     if not df.iloc[0, i] > 0:
-    #         columna_borrar = columnas[i]
-    #         df_copy.drop([columna_borrar], axis=1, inplace= True)
-    #         # print(columna_borrar)
-    #
-    # # df_copy.to_excel('pturbs.xlsx')
-    #
-    # retornos = df_copy.pct_change()
-    # retornos = retornos.dropna()
-    # # print(retornos)
-    #
-    # retornos = retornos.filter(list(activos.keys())).dropna()
-    #
-    # df_ajustado = filter_return_2(df = retornos, coins_dict=activos)
-    # print(df_ajustado)
-    #
-    # print(markowitz(df = df_ajustado, coins_dict= activos))
     pass
 
 

@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 import model_service
+import config
 
 def filter_return_1(df, vol_neg_accepted = 0):
 
@@ -79,7 +80,7 @@ def build_retornos():
             columna_borrar = columnas[i]
             df_copy.drop([columna_borrar], axis=1, inplace=True)
 
-    print(retornos)
+    # print(retornos)
 
     # df_copy.to_excel('pturbs.xlsx')
 
@@ -93,12 +94,10 @@ def sortino_2(retornos, df_adjust, coins_dict, vol_neg_accepted = 0):
     r['pond'] = [coins_dict[x] for x in r['coins']]
     r['roi'] = np.sum((retornos.mean() * r['pond'] * 365))
 
-    sharpe = {}
-    sharpe['volatility'] = np.sqrt(np.dot(r['pond'], np.dot(df_adjust.cov() * 365, r['pond'])))
-    sharpe['sharpe'] = r['roi'] / sharpe['volatility']
+    r['volatility_2'] = np.sqrt(np.dot(r['pond'], np.dot(df_adjust.cov() * 365, r['pond'])))
+    r['sortino_2'] = r['roi'] / r['volatility_2']
 
-    return {'roi': r['roi'], 'volatility': sharpe['volatility'], 'ratio': sharpe['sharpe']}
-
+    return {'roi': r['roi'], 'volatility': r['volatility_2'] , 'ratio': r['sortino_2']}
 
 def calc_ratio(distribution):
     global retornos
@@ -114,22 +113,13 @@ def get_coins():
     coins = retornos.columns
 
     selected_coins = []
-    del_coins = ['DAI', 'BUSD', 'TUSD', 'USDC', 'PAX', 'USDT', 'USDSB', 'AUD', 'EUR', 'GBP', 'SUSD', 'PAXG', 'JUV',
-                 'ACM', 'DREP', 'PSG', 'DOGE', 'XRP']
+    del_coins = [*config.stable_coins, *config.disallowed_coins]
+
     for symbol in coins:
         if symbol not in del_coins:
             selected_coins.append(symbol)
 
     return selected_coins
-
-
-
-
-
-
-
-
-
 
 if __name__ == '__main__':
 

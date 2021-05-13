@@ -4,6 +4,8 @@ from operator import itemgetter
 from markowitz_sortino import calc_ratio, get_coins
 from datetime import datetime
 
+import config
+
 CRYPTO_COUNT = 20
 MAX_PERCENTAGE = 0.10
 
@@ -36,9 +38,19 @@ def calc_total_value(dict):
     return total_value
 
 def get_random_coins(coins, number):
-    copy = coins.copy()
-    random.shuffle(copy)
-    return copy[:number]
+    desired_token_len = len(config.desired_coins)
+
+    random_coins_length = number - desired_token_len
+
+    filtered_coins = [coin for coin in coins if coin not in config.desired_coins]
+
+    random.shuffle(filtered_coins)
+
+    selected_coins = filtered_coins[:random_coins_length]
+
+    result = [*config.desired_coins, *selected_coins]
+
+    return result
 
 def get_ramdom_value(min, max):
     value = random.uniform(min, max)
@@ -92,7 +104,8 @@ def get_top_results(coin_dict, old_top):
     max_len = len(coins) ** 2
 
     # maximum max_lenght
-    max_len = 10000 if max_len > 10000 else max_len
+    # max_len = 10000 if max_len > 10000 else max_len
+    max_len = 1000 if max_len > 1000 else max_len
 
     #minimim max_lenght
     max_len = 1000 if max_len < 1000 else max_len

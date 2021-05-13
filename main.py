@@ -3,7 +3,7 @@ import markowitz_sortino
 import marcopolo
 
 
-# binance.Binance().saveHistorical('USDT')
+# binance.Binance_new().saveHistorical('USDT')
 markowitz_sortino.build_retornos()
 marcopolo.run_montecarlo()
 

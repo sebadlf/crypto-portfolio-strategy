@@ -259,6 +259,8 @@ def run_montecarlo():
 
     print(datetime.now() - start)
 
+    return top[0]
+
 
 
 

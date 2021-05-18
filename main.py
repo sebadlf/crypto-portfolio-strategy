@@ -3,7 +3,7 @@ import markowitz_sortino
 import marcopolo
 import telegram_bot as tb
 
-binance.Binance_new().saveHistorical('USDT')
+binance.Binance_new().saveMarketData()
 markowitz_sortino.build_retornos()
 best_portfolio = marcopolo.run_montecarlo()
 

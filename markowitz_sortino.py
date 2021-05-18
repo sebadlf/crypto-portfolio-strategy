@@ -62,9 +62,9 @@ def build_retornos():
     df = model_service.export_historical_data()
 
     df.drop(['id', 'open', 'high', 'low', 'volume', 'close_time', 'quote_asset_volume', 'trades',
-             'taker_buy_base', 'taker_buy_quote', 'ignore'], axis=1, inplace=True)
+             'taker_buy_base', 'taker_buy_quote', 'ignore', 'close', 'quote_currency'], axis=1, inplace=True)
 
-    df = df.pivot(index='open_time', columns='symbol', values='close')
+    df = df.pivot(index='open_time', columns='symbol', values='close_adj')
 
     # borro up and down y las que no sean selected coins
     coins = df.columns

@@ -28,6 +28,13 @@ def get_currencies_list():
 
         return currencies
 
+def get_currencies_by_quote(quote_currency):
+    with Session(model.engine) as session:
+        results = session.query(model.Coin.base_currency).filter_by(quote_currency=quote_currency).all()
+        currencies = [r[0] for r in results]
+
+        return currencies
+
 
 def sync_currencies():
     with Session(model.engine) as session, session.begin():
@@ -37,7 +44,7 @@ def sync_currencies():
 
             db_currency = session.query(model.Currency).filter_by(symbol=currency).first()
 
-            print(currency)
+            # print(currency, end=', ')
 
             if not db_currency:
                 db_currency = model.Currency(symbol=currency)
@@ -85,13 +92,24 @@ def export_historical_data(table = 'market_data_binance'):
 
 
 
-def save_historical_data_binance(symbol, historical_data):
+def save_historical_data_binance(symbol, historical_data, quote_currency):
     with Session(model_binance.engine) as session, session.begin():
         for hour_data in historical_data:
+            
+            if quote_currency in ['BTC', 'ETH', 'EOS', 'ETC']:
+                cTime = datetime.fromtimestamp(hour_data[6]/1000).replace(microsecond=0)
+                new_close_query = session.query(model_binance.MarketData).filter_by(symbol=quote_currency, close_time = cTime).first()
+                try:
+                    close_adj = float(hour_data[4]) * new_close_query.close
+                except:
+                    clsoe_adj = hour_data[4]
 
+            else:
+                close_adj = hour_data[4]
+            
             market_data = model_binance.MarketData(symbol=symbol)
             session.add(market_data)
-
+            
             market_data.open_time = datetime.fromtimestamp(hour_data[0]/1000)
             market_data.open = hour_data[1]
             market_data.high = hour_data[2]
@@ -104,6 +122,8 @@ def save_historical_data_binance(symbol, historical_data):
             market_data.taker_buy_base = hour_data[9]
             market_data.taker_buy_quote = hour_data[10]
             market_data.ignore = hour_data[11]
+            market_data.quote_currency = quote_currency
+            market_data.close_adj = close_adj
 
 def last_date(symbol, conn,tabla = 'market_data_binance'):
     from sqlalchemy import create_engine
@@ -136,12 +156,12 @@ if __name__ == '__main__':
     #
     # print(last_date('BTC', db_connection))
 
-    lista1 = [0,1,2,3]
-    lista2 = [4,5,6]
+    # lista1 = [0,1,2,3]
+    # lista2 = [4,5,6]
 
-    lista = lista1 + lista2
-    print(lista)
-
+    # lista = lista1 + lista2
+    # print(lista)
+    
     pass
 
 

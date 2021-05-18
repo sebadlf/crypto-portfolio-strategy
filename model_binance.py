@@ -43,6 +43,8 @@ class MarketData(Base):
     taker_buy_base = Column(Float)
     taker_buy_quote = Column(Float)
     ignore = Column(Float)
+    quote_currency = Column(String(10))
+    close_adj = Column(Float)
 
     __table_args__ = (
         Index('symbol', symbol, open_time),

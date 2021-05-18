@@ -17,18 +17,21 @@ logger = logging.getLogger(__name__)
 class Binance_new():
     _URL = 'https://api.binance.com/api/v3/'
 
+    def __init__(self):
+        self.currencies_list = []
+
     def getSymbols(self, quote_currency):
 
         symbols_list = []
 
         try:
-            logger.info(f'Bajando lista de symbols en USDT')
+            logger.info(f'Bajando lista de symbols en {quote_currency}')
             endpoint = self._URL + 'ticker/price'
             r = requests.get(endpoint).json()
             symbols = [dic['symbol'] for dic in r if re.search(quote_currency, dic['symbol'])]
 
             for symbol in symbols:
-                search = r'\D*DOWN|UP|BULL|BEAR|^DAI|^BUSD|^TUSD|^USDC|^PAX|^USDT'
+                search = r'\D*DOWN|UP|BULL|BEAR|^DAI|^BUSD|^TUSD|^USDC|^PAX|^USDT|^USDSB|^AUD|^EUR|^GBP|^SUSD'
                 if re.search(search, symbol) is None:
                     base_currency = symbol.split(quote_currency)[0]
                     lst = [symbol, base_currency, quote_currency]
@@ -121,7 +124,11 @@ class Binance_new():
 
         model_service.sync_currencies()
 
-        for currency in model_service.get_currencies_list():
+        currenciesList = list(set(model_service.get_currencies_by_quote(quote_currency)) - set(self.currencies_list))
+        print(f'{len(currenciesList)} Coins\n{currenciesList}')
+        self.currencies_list += currenciesList
+        
+        for currency in currenciesList:
             print(currency, end=', ')
 
             try:
@@ -131,12 +138,19 @@ class Binance_new():
                     model_service.del_row(last_date, db_connection)
                     since = last_date[1]
 
-                historical_data = Binance_new().getHistorical(currency, startTime= since)
+                historical_data = Binance_new().getHistorical(currency, startTime= since, quote_currency= quote_currency)
                 if historical_data != []:
-                    model_service.save_historical_data_binance(currency, historical_data)
+                    model_service.save_historical_data_binance(currency, historical_data, quote_currency)
             except:
                 traceback.print_exc()
                 pass
+    
+    
+    def saveMarketData(self, quote_currencies_list):
+        
+        for quote_currency in quote_currencies_list:
+            print(f'Quote Currency: {quote_currency}')
+            self.saveHistorical(quote_currency = quote_currency)        
 
 
 
@@ -210,7 +224,8 @@ class Binance_new():
 
 if __name__ == '__main__':
     # Binance_new().saveHistorical('USDT')
-    prueba = Binance_new().saveHistorical(quote_currency = 'BTC')
+    quote_currencies = ['USDT', 'BTC', 'ETH', 'DAI', 'BUSD', 'USDC', 'EOS', 'ETC']
+    Binance_new().saveMarketData(quote_currencies)
     # print(prueba)
 
     # hoy = dt.now()

@@ -146,9 +146,9 @@ class Binance_new():
                 pass
     
     
-    def saveMarketData(self, quote_currencies_list):
-        
-        for quote_currency in quote_currencies_list:
+    def saveMarketData(self):
+        quote_currencies = ['USDT', 'BTC', 'ETH', 'DAI', 'BUSD', 'USDC', 'EOS', 'ETC']
+        for quote_currency in quote_currencies:
             print(f'Quote Currency: {quote_currency}')
             self.saveHistorical(quote_currency = quote_currency)        
 
@@ -224,8 +224,8 @@ class Binance_new():
 
 if __name__ == '__main__':
     # Binance_new().saveHistorical('USDT')
-    quote_currencies = ['USDT', 'BTC', 'ETH', 'DAI', 'BUSD', 'USDC', 'EOS', 'ETC']
-    Binance_new().saveMarketData(quote_currencies)
+    
+    Binance_new().saveMarketData()
     # print(prueba)
 
     # hoy = dt.now()
